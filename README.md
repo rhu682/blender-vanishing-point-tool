@@ -17,3 +17,4 @@ A Blender Addon to automatically calculate perspective from vanishing points.
 # Resources/References
 - Textbook: [Multiple View Geometry in Computer Vision](https://github.com/DeepRobot2020/books/blob/master/Multiple%20View%20Geometry%20in%20Computer%20Vision%20(Second%20Edition).pdf) Section 8.6.1
 - [fSpy](https://fspy.io/)
+- [Camera Position Tutorial](https://www.fxphd.com/tips/finding-the-cameras-position-tutorial/)
