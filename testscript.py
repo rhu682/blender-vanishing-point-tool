@@ -1,6 +1,4 @@
-# This is where I'm testing scripts.
-
-# YJ was here
+# Scripts to test go here.
 
 import bpy
 
