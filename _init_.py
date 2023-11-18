@@ -1,5 +1,7 @@
+# Skeleton from https://docs.blender.org/manual/en/latest/advanced/scripting/addon_tutorial.html
+
 bl_info = {
-    "name": "Move X Axis",
+    "name": "Vanishing Point Tool",
     "blender": (2, 80, 0),
     "category": "Object",
 }
