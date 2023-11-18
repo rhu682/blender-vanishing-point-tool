@@ -13,3 +13,7 @@ A Blender Addon to automatically calculate perspective from vanishing points.
 ## Stretch goals:
 - [ ] Incorporation "importing image as plane" into our addon
 - [ ] Make it so that we don't neccessarily have to be orthographic to run this script - what if the image is not axis-aligned?
+
+# Resources/References
+- Textbook: [Multiple View Geometry in Computer Vision](https://github.com/DeepRobot2020/books/blob/master/Multiple%20View%20Geometry%20in%20Computer%20Vision%20(Second%20Edition).pdf) Section 8.6.1
+- [fSpy](https://fspy.io/)
