@@ -7,8 +7,6 @@ bl_info = {
 }
 
 import bpy
-from functions import *
-
 
 class ObjectMoveX(bpy.types.Operator):
     """My Object Moving Script"""      # Use this as a tooltip for menu items and buttons.
