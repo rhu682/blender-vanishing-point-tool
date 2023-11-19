@@ -14,6 +14,8 @@ def update_camera(camera, focus_point=mathutils.Vector((0.0, 0.0, 0.0)), distanc
     :type focus_point: mathutils.Vector
     :param distance: the distance to keep to the focus point (default=``10.0``)
     :type distance: float
+
+    Source: https://blender.stackexchange.com/questions/100414/how-to-set-camera-location-in-the-scene-while-pointing-towards-an-object-with-a
     """
     looking_direction = camera.location - focus_point
     rot_quat = looking_direction.to_track_quat('Z', 'Y')
@@ -21,7 +23,3 @@ def update_camera(camera, focus_point=mathutils.Vector((0.0, 0.0, 0.0)), distanc
     camera.rotation_euler = rot_quat.to_euler()
     # Use * instead of @ for Blender <2.8
     camera.location = rot_quat @ mathutils.Vector((0.0, 0.0, distance))
-
-update_camera(bpy.data.objects['Camera'])
-
-# Source: https://blender.stackexchange.com/questions/100414/how-to-set-camera-location-in-the-scene-while-pointing-towards-an-object-with-a
