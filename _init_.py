@@ -7,6 +7,7 @@ bl_info = {
 }
 
 import bpy
+from . import functions
 
 
 class ObjectMoveX(bpy.types.Operator):
