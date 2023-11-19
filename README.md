@@ -8,15 +8,20 @@ This is a class project for CS155 FA23.
 - [X] Import image as plane - We are not implementing this; the user has to do it themselves.
 - [X] Create camera to be orthographically aligned with image
 - [X] make a plane and align to a perspective in the image
-- [ ] select image and plane and hit an operator
+- [X] select image and plane and hit an operator
 - [ ] do vanishing point and camera calculations (seperate function, requires math)
-- [ ] set camera to the calculated pose data and move the image to be head on with camera
+- [X] set camera to the calculated pose data and move the image to be head on with camera
 
 ## Stretch goals:
 - [ ] Incorporation "importing image as plane" into our addon
 - [ ] Make it so that we don't neccessarily have to be orthographic to run this script - what if the image is not axis-aligned?
-- [ ] Error handling
-- [ ] alignPlaneToCam() presumes that the image is a plane facing the x-axis. What if it isn't? Implement it differently to account for different directions.
+    - [ ] Have operator automatically create a camera "head-on" with the selected image
+    - [ ] Have all calculations take place relative to the camera, not necessarily to x-axis
+- [ ] alignPlaneToCam() presumes that the image is a plane facing the x-axis. What if it isn't? Implement it differently to account for different directions (check the plane's normal and use that instead of the x-axis)
+
+## Rohan's TODO's
+- [ ] Move testscript.py stuff to `_init_` and turn it into an addon
+- [ ] Study vanishing point to camera pose calculations
 
 # Resources/References
 - Textbook: [Multiple View Geometry in Computer Vision](https://github.com/DeepRobot2020/books/blob/master/Multiple%20View%20Geometry%20in%20Computer%20Vision%20(Second%20Edition).pdf) Section 8.6.1
