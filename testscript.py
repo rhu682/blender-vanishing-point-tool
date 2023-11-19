@@ -1,7 +1,9 @@
-# Currently this script is a skeleton for the basic operation of our add-on.
-
-# It will later be turned from a script into an add-on.
 import bpy
+import mathutils
+
+# Currently this script is a skeleton for the basic operation of our add-on.
+# It will later be turned from a script into an add-on.
+
 
 scene = bpy.context.scene
 ''' User must select *first* the image, then the aligning plane, and nothing 
@@ -27,7 +29,7 @@ print("Vanishing point calculation not yet implemented.")
 cam = bpy.data.cameras.new("VP_cam")
 cam.lens = 18
 cam_obj = bpy.data.objects.new("VP_cam", cam)
-cam_obj.location = (9.69, -10.85, 12.388)
+cam_obj.location = (1, 1, 1)
 cam_obj.rotation_euler = (0.6799, 0, 0.8254)
 bpy.context.scene.collection.objects.link(cam_obj)
 
@@ -45,11 +47,15 @@ def alignPlaneToCam(camera, plane, distance):
     cam_orig = camera.location
     cam_dir = camera.rotation_euler
 
-    # TODO: calculate the position to place the plane (origin + direction vector * distance)
-    plane_pos = cam_orig + cam_dir * distance
-    # TODO: place plane there
+    rot_mat = cam_dir.to_matrix()
+    forwardVec = mathutils.Vector((0,0,1))
+    forwardVec.rotate(cam_dir)
 
-    # TODO: rotate plane so that it is facing -direction vector
-    pass
+    # calculate the position to place the plane (origin + direction vector * distance)
+    plane.location = cam_orig - (forwardVec) * distance
 
-alignPlaneToCam(cam_obj,image, 10) # 10 is a dummy value
+    # rotate plane so that it is facing -direction vector
+    plane.rotation_euler = cam_dir
+
+alignPlaneToCam(cam_obj,image, 1) 
+# TODO: 1 is a dummy value -- replace with the appropriate value.
