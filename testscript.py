@@ -41,7 +41,7 @@ CameraPose = namedtuple('CameraPose', 'location rotation focal_length')
 ######################
 ## HELPER FUNCTIONS ##
 ######################
-def alignPlaneToCam(camera, plane, distance):
+def alignPlaneToCam(camera, plane, distance: float):
     '''    
     Takes in a plane and aligns it so that it is head-on with the camera, with the x-axis.
 
@@ -68,12 +68,46 @@ def alignPlaneToCam(camera, plane, distance):
     # rotate plane so that it is facing -direction vector
     plane.rotation_euler = cam_dir
 
-def solve2VP(vps, imDimen):
+def computeFocalLength(Fu: Coords2D, Fv: Coords2D, P: Coords2D):
+    '''
+   Computes the focal length based on two vanishing points and a center of projection.
+
+   Code modified from https://github.com/stuffmatic/fSpy/blob/702189ec5acbbd2c8ba492db0e52ecb5fc908f5c/src/gui/solver/solver.ts#L305
+   
+   ### Parameters
+    1. Fu : Coords2D
+        - the first vanishing point in image plane coordinates.
+    2. Fv : Coords2D
+        - the second vanishing point in image plane coordinates.
+    3. P : Coords2D
+        - the center of projection in image plane coordinates.
+
+    ### Returns
+    - float
+        - The relative focal length.
+   '''
+    # compute Puv, the orthogonal projection of P onto FuFv
+    dirFuFv = mathutils.Vector((Fu.x - Fv.x, Fu.y - Fv.y)).normalize()
+    FvP = mathutils.Vector((P.x - Fv.x, P.y - Fv.y))
+    proj = dirFuFv.dot(FvP)
+    Puv = Coords2D(proj * dirFuFv.x + Fv.x, proj * dirFuFv.y + Fv.y)
+
+    PPuv = mathutils.Vector((P.x - Puv.x, P.y - Puv.y)).length
+    FvPuv = mathutils.Vector((Fv.x - Puv.x, Fv.y - Puv.y)).length
+    FuPuv = mathutils.Vector((Fu.x - Puv.x, Fu.y - Puv.y)).length
+
+    fSq = FvPuv * FuPuv - PPuv * PPuv
+
+    if (fSq <= 0):
+      return None
+    return mathutils.sqrt(fSq)
+
+def solve2VP(vps: (Coords2D, Coords2D), imDimen: (int, int)):
     '''     
     Given 2 vanishing points, calculate the camera pose that corresponds with those vanishing points. 
 
     ### Parameters
-    1. vps : Tuple[float, float]
+    1. vps : Tuple[Coords2D, Coords2D]
         - An array of vanishing point locations. 
         - These locations should be given in relative coordinates relative to the image plane. 
         - Points inside the plane are in the range (-1.0, 1.0).
@@ -88,11 +122,19 @@ def solve2VP(vps, imDimen):
     pose = CameraPose(Coords3D(0.0, 0.0, 0.0), Coords3D(0.0, 0.0, 0.0), 10)
 
     # Reference: https://github.com/stuffmatic/fSpy/blob/develop/src/gui/solver/solver.ts
-    #TODO: 211: get "principal point", which is described as "the center of projection in image plane coordinates". I'm not entirely sure what that means?
-    #TODO: 248: compute focal length of camera using the 3 vanishing points, using a helper function at 305
+    # Get principal point. Information on principal point is given here: https://fspy.io/tutorial/
+    # Not entirely sure what it means, though. For now, we just assume that it's the midpoint of the image.
+    principalPoint = Coords2D(0.0, 0.0)
+
+    #compute focal length of camera using the 3 points
+    computeFocalLength(vps[0], vps[1], principalPoint)
+
     #TODO: 262: check accuracy of vanishing points using a helper function at 607. we might skip this step
+
     #TODO: 264: compute camera parameters using a helper function at 737
-    #TODO: https://github.com/stuffmatic/fSpy-Blender/blob/eec40b085d45cc623fd379998d85b88de679d4b8/fspy_blender/addon.py#L68: transform the output from the previous step into blender camera data
+
+    #TODO: https://github.com/stuffmatic/fSpy-Blender/blob/eec40b085d45cc623fd379998d85b88de679d4b8/fspy_blender/addon.py#L68: 
+    # transform the output from the previous step into blender camera data
     
     print("Vanishing point calculation not yet implemented.")
 
