@@ -9,7 +9,7 @@ This is a class project for CS155 FA23.
 - [X] Create camera to be orthographically aligned with image
 - [X] make a plane and align to a perspective in the image
 - [X] select image and plane and hit an operator
-- [ ] do vanishing point and camera calculations (seperate function, requires math)
+- [ ] do vanishing point and camera calculations (seperate function, requires math) (function solve2VP in testscript.py)
 - [X] set camera to the calculated pose data and move the image to be head on with camera
 
 ## Stretch goals:
@@ -18,6 +18,8 @@ This is a class project for CS155 FA23.
     - [ ] Have operator automatically create a camera "head-on" with the selected image
     - [ ] Have all calculations take place relative to the camera, not necessarily to x-axis
 - [ ] alignPlaneToCam() presumes that the image is a plane facing the x-axis. What if it isn't? Implement it differently to account for different directions (check the plane's normal and use that instead of the x-axis)
+- [ ] add functionality for 1 and 3 point perspective
+- [ ] add some fancy blender UI stuff with lines so that we don't have to use a plane
 
 ## Rohan's TODO's
 - [ ] Move testscript.py stuff to `_init_` and turn it into an addon
