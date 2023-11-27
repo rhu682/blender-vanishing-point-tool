@@ -42,16 +42,19 @@ CameraPose = namedtuple('CameraPose', 'location rotation focal_length')
 ## HELPER FUNCTIONS ##
 ######################
 def alignPlaneToCam(camera, plane, distance):
-    '''
+    '''    
     Takes in a plane and aligns it so that it is head-on with the camera, with the x-axis.
-    
-    :param camera: the camera object
-    :type camera: bpy.types.object
-    :param plane: the plane
-    :type plane: bpy.types.object
-    :param distance: distance from the camera to place the plane
-    :type distance: float
-    :param return: none'''
+
+    ### Parameters
+    1. camera : bpy.types.object
+        - the camera object
+    2. plane : bpy.types.object
+        - the plane
+    3. distance : float
+        - distance from the camera to place the plane
+
+    ### Returns
+    - None'''
     cam_orig = camera.location
     cam_dir = camera.rotation_euler
 
@@ -66,25 +69,33 @@ def alignPlaneToCam(camera, plane, distance):
     plane.rotation_euler = cam_dir
 
 def solve2VP(vps, imDimen):
-    ''' Given 2 vanishing points, calculate the camera pose that corresponds with those vanishing points. 
+    '''     
+    Given 2 vanishing points, calculate the camera pose that corresponds with those vanishing points. 
 
-    :param vps: an array of vanishing point locations. 
-                These locations should be given in relative coordinates relative to the image plane. 
-                Points inside the plane are in the range (-1.0, 1.0).
-    :type vps: an array of tuples of floats. Should have a length of 2. 
-    :param imDimen: the dimensions of the image plane, in pixels. 
-    :type imDimen: A tuple of 2 floats in (horizontal_width, vertical_width) order. 
-    :param return: Pose data for a camera. 
-    :type return: A CameraPose namedtuple.'''
+    ### Parameters
+    1. vps : Tuple[float, float]
+        - An array of vanishing point locations. 
+        - These locations should be given in relative coordinates relative to the image plane. 
+        - Points inside the plane are in the range (-1.0, 1.0).
+    2. imDimen : Tuple[int, int]
+        - The dimensions of the image plane, in pixels. 
+
+    ### Returns
+    - CameraPose
+        - Pose data for a camera. 
+    '''
 
     pose = CameraPose(Coords3D(0.0, 0.0, 0.0), Coords3D(0.0, 0.0, 0.0), 10)
 
+    # Reference: https://github.com/stuffmatic/fSpy/blob/develop/src/gui/solver/solver.ts
     #TODO: 211: get "principal point", which is described as "the center of projection in image plane coordinates". I'm not entirely sure what that means?
     #TODO: 248: compute focal length of camera using the 3 vanishing points, using a helper function at 305
     #TODO: 262: check accuracy of vanishing points using a helper function at 607. we might skip this step
     #TODO: 264: compute camera parameters using a helper function at 737
     #TODO: https://github.com/stuffmatic/fSpy-Blender/blob/eec40b085d45cc623fd379998d85b88de679d4b8/fspy_blender/addon.py#L68: transform the output from the previous step into blender camera data
     
+    print("Vanishing point calculation not yet implemented.")
+
     return pose
 
 ##########
@@ -98,6 +109,7 @@ scene = bpy.context.scene
 # Get image and plane data from selected objects.
 aligner = bpy.context.active_object
 
+# Verify that only 2 objects are selected.
 if len(bpy.context.selected_objects) != 2:
     raise RuntimeError("Expected only two objects to be selected.")
 
@@ -106,21 +118,21 @@ if bpy.context.selected_objects[0] == aligner:
 else:
     image = bpy.context.selected_objects[0]
     
-# TODO: Get distance from camera to image, and store it, and later pass it into alignPlaneToCam.
+# TODO: Either create a camera automatically, or require that a camera also exists.
+# Get distance from camera to image, and store it, and later pass it into alignPlaneToCam.
 
 # TODO: transform aligner data and pass it to vanishing point calculation function
 # We want to transform the data into relative coordinates wrt image plane.
 # Should include error handling for when "aligner" is not a 4 point plane.
-print("Vanishing point calculation not yet implemented.")
 
-# TODO: Transform output into Blender camera pose data
-# Make new camera, give it a dummy position/rotation/perspective
+pose = solve2VP(None, None)
+
 # https://blender.stackexchange.com/questions/151319/adding-camera-to-scene
 cam = bpy.data.cameras.new("VP_cam")
-cam.lens = 18
+cam.lens = pose.focal_length
 cam_obj = bpy.data.objects.new("VP_cam", cam)
-cam_obj.location = (1, 1, 1)
-cam_obj.rotation_euler = (0.6799, 0, 0.8254)
+cam_obj.location = pose.location
+cam_obj.rotation_euler = pose.rotation
 bpy.context.scene.collection.objects.link(cam_obj)
 
 # Move image to be head-on with camera
