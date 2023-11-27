@@ -6,7 +6,6 @@ This is a class project for CS155 FA23.
 # TODO
 ## Workflow draft:
 - [X] Import image as plane - We are not implementing this; the user has to do it themselves.
-- [X] Create camera to be orthographically aligned with image
 - [X] make a plane and align to a perspective in the image
 - [X] select image and plane and hit an operator
 - [ ] do vanishing point and camera calculations (seperate function, requires math) (function solve2VP in testscript.py)
@@ -23,7 +22,7 @@ This is a class project for CS155 FA23.
 
 ## Rohan's TODO's
 - [ ] Move testscript.py stuff to `_init_` and turn it into an addon
-- [ ] Study vanishing point to camera pose calculations
+- [X] Study vanishing point to camera pose calculations
 
 # Resources/References
 - Textbook: [Multiple View Geometry in Computer Vision](https://github.com/DeepRobot2020/books/blob/master/Multiple%20View%20Geometry%20in%20Computer%20Vision%20(Second%20Edition).pdf) Section 8.6.1
