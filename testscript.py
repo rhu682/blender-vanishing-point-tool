@@ -117,9 +117,14 @@ if bpy.context.selected_objects[0] == aligner:
     image = bpy.context.selected_objects[1]
 else:
     image = bpy.context.selected_objects[0]
-    
-# TODO: Either create a camera automatically, or require that a camera also exists.
-# Get distance from camera to image, and store it, and later pass it into alignPlaneToCam.
+
+# Get camera.
+cam = bpy.context.scene.camera
+if cam == None:
+    raise RuntimeError("No active camera.")
+
+# Get distance from camera to image
+dist = (cam.location - image.location).length
 
 # TODO: transform aligner data and pass it to vanishing point calculation function
 # We want to transform the data into relative coordinates wrt image plane.
@@ -128,13 +133,10 @@ else:
 pose = solve2VP(None, None)
 
 # https://blender.stackexchange.com/questions/151319/adding-camera-to-scene
-cam = bpy.data.cameras.new("VP_cam")
-cam.lens = pose.focal_length
-cam_obj = bpy.data.objects.new("VP_cam", cam)
-cam_obj.location = pose.location
-cam_obj.rotation_euler = pose.rotation
-bpy.context.scene.collection.objects.link(cam_obj)
+cam.data.lens = pose.focal_length
+cam.location = pose.location
+cam.rotation_euler = pose.rotation
 
 # Move image to be head-on with camera
-alignPlaneToCam(cam_obj,image, 1) 
+alignPlaneToCam(cam,image, 5) 
 # TODO: 1 is a dummy value -- replace with the appropriate value.
