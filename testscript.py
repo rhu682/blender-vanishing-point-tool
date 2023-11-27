@@ -139,4 +139,5 @@ cam.rotation_euler = pose.rotation
 
 # Move image to be head-on with camera
 alignPlaneToCam(cam,image, 5) 
-# TODO: 1 is a dummy value -- replace with the appropriate value.
+# TODO: 1 is a dummy value -- replace with the appropriate value. 
+# Probably some function of original distance + original focal length and new focal length. Linearly related?
