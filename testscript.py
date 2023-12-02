@@ -1,6 +1,7 @@
 import bpy
 import mathutils
 from collections import namedtuple
+from math import sqrt
 
 """
 DOCSTRING REFERENCE vvv
@@ -76,18 +77,19 @@ def computeFocalLength(Fu: Coords2D, Fv: Coords2D, P: Coords2D):
    
    ### Parameters
     1. Fu : Coords2D
-        - the first vanishing point in image plane coordinates.
+        - the first vanishing point in image plane coordinates. Unit in pixels.
     2. Fv : Coords2D
-        - the second vanishing point in image plane coordinates.
+        - the second vanishing point in image plane coordinates. Unit in pixels.
     3. P : Coords2D
-        - the center of projection in image plane coordinates.
+        - the center of projection in image plane coordinates. Unit in pixels.
 
     ### Returns
     - float
         - The relative focal length.
    '''
     # compute Puv, the orthogonal projection of P onto FuFv
-    dirFuFv = mathutils.Vector((Fu.x - Fv.x, Fu.y - Fv.y)).normalize()
+    dirFuFv = mathutils.Vector((Fu.x - Fv.x, Fu.y - Fv.y))
+    dirFuFv.normalize()
     FvP = mathutils.Vector((P.x - Fv.x, P.y - Fv.y))
     proj = dirFuFv.dot(FvP)
     Puv = Coords2D(proj * dirFuFv.x + Fv.x, proj * dirFuFv.y + Fv.y)
@@ -100,7 +102,55 @@ def computeFocalLength(Fu: Coords2D, Fv: Coords2D, P: Coords2D):
 
     if (fSq <= 0):
       return None
-    return mathutils.sqrt(fSq)
+    return sqrt(fSq)
+
+def pixelToNormCoords2d (coords: Coords2D, imSize: (int, int)):
+    return Coords2D(coords.x / imSize[0],coords.y / imSize[1])
+
+def computeCameraRotationMatrix(Fu: Coords2D, Fv: Coords2D, f: float, P: Coords2D):
+    """
+    Computes the camera rotation matrix based on two vanishing points.
+    Code adapted from https://github.com/stuffmatic/fSpy/blob/702189ec5acbbd2c8ba492db0e52ecb5fc908f5c/src/gui/solver/solver.ts#L336
+
+    ### Parameters
+    1. Fu : Coords2
+        - the first vanishing point in normalized image coordinates.
+    2. Fv : Coords2
+        - the second vanishing point in normalized image coordinates.
+    3. f : float
+        - the relative focal length
+    4. P : Coords2
+        - the principal point
+
+    ### Returns
+    - mathutils.Matrix([4,4])
+    """        
+    OFu = mathutils.Vector((Fu.x - P.x, Fu.y - P.y, -f))
+    OFv = mathutils.Vector((Fv.x - P.x, Fv.y - P.y, -f))
+
+    s1 = OFu.length
+    upRc = OFu.normalized()
+
+    s2 = OFv.length
+    vpRc = OFv.normalized()
+
+    wpRc = upRc.cross(vpRc)
+
+    M = mathutils.Matrix.Identity(3) 
+
+    M[0][0] = OFu[0] / s1
+    M[0][1] = OFv[0] / s2
+    M[0][2] = wpRc[0]
+
+    M[1][0] = OFu[1] / s1
+    M[1][1] = OFv[1] / s2
+    M[1][2] = wpRc[1]
+
+    M[2][0] = -f / s1
+    M[2][1] = -f / s2
+    M[2][2] = wpRc[2]
+
+    return M  
 
 def solve2VP(vps: (Coords2D, Coords2D), imDimen: (int, int)):
     '''     
@@ -109,43 +159,37 @@ def solve2VP(vps: (Coords2D, Coords2D), imDimen: (int, int)):
     ### Parameters
     1. vps : Tuple[Coords2D, Coords2D]
         - An array of vanishing point locations. 
-        - These locations should be given in relative coordinates relative to the image plane. 
-        - Points inside the plane are in the range (-1.0, 1.0).
+        - These locations should be given in pixel coordinates relative to the image plane, 
+        with the top left corner being (0,0).
     2. imDimen : Tuple[int, int]
         - The dimensions of the image plane, in pixels. 
 
     ### Returns
-    - CameraPose
-        - Pose data for a camera. 
+    - TODO: fill out
     '''
+    # not used - replaced w/ rotation matrix
+    # pose = CameraPose(Coords3D(0.0, 0.0, 0.0), Coords3D(0.0, 0.0, 0.0), 10)
 
-    pose = CameraPose(Coords3D(0.0, 0.0, 0.0), Coords3D(0.0, 0.0, 0.0), 10)
-
-    # Reference: https://github.com/stuffmatic/fSpy/blob/develop/src/gui/solver/solver.ts
+    # Code adapted from: https://github.com/stuffmatic/fSpy/blob/develop/src/gui/solver/solver.ts
     # Get principal point. Information on principal point is given here: https://fspy.io/tutorial/
     # Not entirely sure what it means, though. For now, we just assume that it's the midpoint of the image.
     # TODO: figure out what principal point is and correct it?
-    principalPoint = Coords2D(0.0, 0.0)
+    principalPoint = Coords2D(imDimen.x/2, imDimen.y/2)
 
     #compute focal length of camera using the 3 points
-    computeFocalLength(vps[0], vps[1], principalPoint)
+    focal_length = computeFocalLength(vps[0], vps[1], principalPoint)
 
-    #TODO: 262: check accuracy of vanishing points using a helper function at 607. we might skip this step
-
-    #TODO: 264: compute camera parameters using a helper function at 737
-
-    #TODO: https://github.com/stuffmatic/fSpy-Blender/blob/eec40b085d45cc623fd379998d85b88de679d4b8/fspy_blender/addon.py#L68: 
-    # transform the output from the previous step into blender camera data
+    # compute camera rotation
+    # https://github.com/stuffmatic/fSpy/blob/702189ec5acbbd2c8ba492db0e52ecb5fc908f5c/src/gui/solver/solver.ts#L737C14-L737C14
+    transformMatrix = computeCameraRotationMatrix(pixelToNormCoords2d(vps[0],imDimen), pixelToNormCoords2d(vps[1],imDimen), focal_length, Coords2D(0.5, 0.5))
     
-    print("Vanishing point calculation not yet implemented.")
+    return transformMatrix, focal_length
 
-    return pose
-
-##########
+############
 ## SCRIPT ##
-##########
+############
 ''' User must select *first* the image, then the aligning plane, and nothing 
-else, and then trigger this script.'''
+else, and then trigger this script. Aligning plane must be the upper plane of a cube.'''
 
 scene = bpy.context.scene
 
@@ -173,12 +217,14 @@ dist = (cam.location - image.location).length
 # We want to transform the data into relative coordinates wrt image plane.
 # Should include error handling for when "aligner" is not a 4 point plane.
 
-pose = solve2VP(None, None)
+rotMat,focal_length = solve2VP((Coords2D(-1000,-100), Coords2D(4000,-100)),\
+     Coords2D(bpy.data.scenes[0].render.resolution_x,bpy.data.scenes[0].render.resolution_y))
 
 # https://blender.stackexchange.com/questions/151319/adding-camera-to-scene
-cam.data.lens = pose.focal_length
-cam.location = pose.location
-cam.rotation_euler = pose.rotation
+cam.data.lens = focal_length * 0.001
+loc, rot, sca = cam.matrix_world.decompose()
+cam.matrix_world = mathutils.Matrix.LocRotScale(loc, rotMat, sca)
+cam.scale = mathutils.Vector((1,1,1))
 
 # Move image to be head-on with camera
 alignPlaneToCam(cam,image, 5) 
