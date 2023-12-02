@@ -20,7 +20,10 @@ This is a class project for CS155 FA23.
 - [ ] add functionality for 1 and 3 point perspective
 - [ ] add some fancy blender UI stuff with lines so that we don't have to use a plane
 
-## Rohan's TODO's
+## TODO
+- [ ] Convert aligning plane data to relative 2D coordinates wrt image plane
+- [ ] Finish solve2VP
+- [ ] Realign image with camera
 - [ ] Move testscript.py stuff to `_init_` and turn it into an addon
 - [X] Study vanishing point to camera pose calculations
 

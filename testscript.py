@@ -124,6 +124,7 @@ def solve2VP(vps: (Coords2D, Coords2D), imDimen: (int, int)):
     # Reference: https://github.com/stuffmatic/fSpy/blob/develop/src/gui/solver/solver.ts
     # Get principal point. Information on principal point is given here: https://fspy.io/tutorial/
     # Not entirely sure what it means, though. For now, we just assume that it's the midpoint of the image.
+    # TODO: figure out what principal point is and correct it?
     principalPoint = Coords2D(0.0, 0.0)
 
     #compute focal length of camera using the 3 points
