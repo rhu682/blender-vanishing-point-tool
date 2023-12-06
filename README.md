@@ -33,3 +33,4 @@ This is a class project for CS155 FA23.
 - [Camera Position Tutorial](https://www.fxphd.com/tips/finding-the-cameras-position-tutorial/)
 - [Blender Addon Tutorial](https://docs.blender.org/manual/en/latest/advanced/scripting/addon_tutorial.html)
 - [Blender Real Camera Addon](https://gitlab.com/marcopavanello/real-camera) (use this as reference for addons)
+- [Camera Calibration using Perspective Views of Rectangles](https://github.com/mrossini-ethz/camera-calibration-pvr)
