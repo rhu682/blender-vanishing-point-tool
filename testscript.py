@@ -230,7 +230,7 @@ def computeFocalLength(Fu: Coords2D, Fv: Coords2D, P: Coords2D):
       return None
     return math.sqrt(fSq)
 
-def camToVP(vps, image, cam, error, max_iter = 100):
+def camToVP(vps, image, cam, error, max_iter = 1000):
     '''
     TODO: finish docstring
     ### Parameters
@@ -260,24 +260,24 @@ def camToVP(vps, image, cam, error, max_iter = 100):
     camMid = midpoint2D(camVP[0], camVP[1])
 
     iter = 0
-    dist = camMid.y - vMid.y
-    # recall distance is in pixels.
+    dist = camMid.y - vMid.y # unit is pixels
     # TODO: until we are within an accepted error, loop and adjust x rotation, which is linked to image plane y pos
     while (abs(dist) > error and iter < max_iter):
         # adjust
         # TODO: fix. not sure how much to iterate from?
-        image.rotation_euler[0] -= dist / 1000
+        image.rotation_euler[0] += dist
 
         # update
         camVP = VPfromCam(cam)
         camMid = midpoint2D(camVP[0], camVP[1])
         dist = camMid.y - vMid.y
         iter += 1
+        print(f"iteration {iter}\ncamVP: {camVP}\ncamMid: {camMid}\ndist: {dist}")
 
 
     # TODO: until we are within an accepted error, loop and adjust z rotation, which is linked to image plane x pos
 
-    print(y_rot)
+    print(f"final rotation: {image.rotation_euler[0]}")
     return
 
 def pixelToNormCoords2d (coords: Coords2D, imSize: (int, int)):
